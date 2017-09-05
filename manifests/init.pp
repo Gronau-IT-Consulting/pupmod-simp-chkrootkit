@@ -27,7 +27,15 @@ class chkrootkit (
 ) {
 
   if $syslog {
-    $_command = "/usr/sbin/chkrootkit -n | /bin/logger -p ${log_dest} -t chkrootkit"
+    if $facts['os']['name'] in ['RedHat','CentOS'] {
+      $_command = "/usr/sbin/chkrootkit -n | /bin/logger -p ${log_dest} -t chkrootkit"
+    }
+    elsif $facts['os']['name'] in ['Debian','Ubuntu'] {
+      $_command = "/usr/sbin/chkrootkit -n | /usr/bin/logger -p ${log_dest} -t chkrootkit"
+    }
+    else {
+      fail("OS '${facts['os']['name']}' not supported by '${module_name}'")
+    }
   }
   else {
     $_command = '/usr/sbin/chkrootkit -n'
